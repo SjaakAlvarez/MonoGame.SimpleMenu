@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31402.337
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.SimpleMenu", "MonoGame.SimpleMenu\MonoGame.SimpleMenu.csproj", "{5F80C179-5D88-4D45-A918-E48FFC1FDFE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.SimpleMenu.Demo", "MonoGame.SimpleMenu.Demo\MonoGame.SimpleMenu.Demo.csproj", "{11296340-1B4E-4122-9A6B-6D7C5BF62918}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F80C179-5D88-4D45-A918-E48FFC1FDFE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F80C179-5D88-4D45-A918-E48FFC1FDFE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F80C179-5D88-4D45-A918-E48FFC1FDFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F80C179-5D88-4D45-A918-E48FFC1FDFE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11296340-1B4E-4122-9A6B-6D7C5BF62918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11296340-1B4E-4122-9A6B-6D7C5BF62918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11296340-1B4E-4122-9A6B-6D7C5BF62918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11296340-1B4E-4122-9A6B-6D7C5BF62918}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ACF0F5C3-4189-4AF3-8911-4ACA985B01AB}
+	EndGlobalSection
+EndGlobal
