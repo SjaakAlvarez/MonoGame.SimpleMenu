@@ -30,16 +30,13 @@ Create a class that holds the configuration items:
     }
 ```
 
-Create the menu in the Initialize of the Game class:
+Create the menu in the Game class:
 
-```C#
-    protected override void Initialize()
-    {        
-        SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, Content, "game.json");
-        menu.MenuCloseEvent += Menu_MenuCloseEvent;        
-        Components.Add(menu);           
-        base.Initialize();
-    }
+```C#      
+    //Create a menu for DemoConfiguration. Settings will be stored in the file 'game.json'
+    SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, "game.json");
+    menu.MenuCloseEvent += Menu_MenuCloseEvent;        
+    Components.Add(menu);                       
 ```
 
 Check out the Demo project for more examples:

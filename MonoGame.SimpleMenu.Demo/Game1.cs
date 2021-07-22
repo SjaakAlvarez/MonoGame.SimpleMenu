@@ -11,8 +11,9 @@ namespace MonoGame.SimpleMenu.Demo
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        string lastChange="Last Change: <nothing>";
+        string lastChange="LAST CHANGE:";
         SpriteFont font;
+        private KeyboardState current, last;
 
 
         public Game1()
@@ -26,23 +27,18 @@ namespace MonoGame.SimpleMenu.Demo
         {
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 600;
-            _graphics.ApplyChanges();
-
-            SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, Content, "game.json");
-            menu.MenuCloseEvent += Menu_MenuCloseEvent;
-            menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
-            Components.Add(menu);
+            _graphics.ApplyChanges();            
            
             base.Initialize();
         }
 
         private void Menu_MenuItemChangedEvent(object sender, Events.MenuItemChangedEventArgs e)
         {
-            lastChange = string.Format("Last Change: {0}={1}", e.Name, e.Value);
+            lastChange = string.Format("LAST CHANGE: {0}={1}", e.Name, e.Value);
         }
 
         private void Menu_MenuCloseEvent(object sender, System.EventArgs e)
-        {
+        {            
             Components.Remove((DrawableGameComponent)sender);
         }
 
@@ -50,23 +46,48 @@ namespace MonoGame.SimpleMenu.Demo
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Fonts/Arcade");
+            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();            
+
+            KeyboardState current = Keyboard.GetState();
+
+            if (current.IsKeyDown(Keys.Escape))
+                Exit();  
+            
+            if(current.IsKeyDown(Keys.D1) && last.IsKeyUp(Keys.D1) && Components.Count==0)
+            {
+                SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, "game.json");
+                menu.MenuCloseEvent += Menu_MenuCloseEvent;
+                menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
+                Components.Add(menu);
+            }
+
+            if (current.IsKeyDown(Keys.D2) && last.IsKeyUp(Keys.D2) && Components.Count == 0)
+            {
+                SettingsMenu<ItemDemoConfiguration> menu = new SettingsMenu<ItemDemoConfiguration>(this, "game2.json");
+                menu.MenuCloseEvent += Menu_MenuCloseEvent;
+                menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
+                Components.Add(menu);
+            }
+
+            last = current;
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.Black);                     
+
             base.Draw(gameTime);
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, lastChange, new Vector2(16, 512),Color.Cyan);
+            _spriteBatch.DrawString(font, "SIMPLE MENU DEMO", new Vector2(16, 584 - 48), Color.Yellow);
+            _spriteBatch.DrawString(font, "PRESS '1' OR '2' FOR DEMO MENUS", new Vector2(16, 584-24),Color.Cyan);
+            _spriteBatch.DrawString(font, lastChange, new Vector2(16, 584), Color.Cyan);
             _spriteBatch.End();
         }
     }

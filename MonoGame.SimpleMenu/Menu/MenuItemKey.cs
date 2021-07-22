@@ -1,7 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.SimpleMenu.Events;
@@ -10,63 +8,31 @@ namespace MonoGame.SimpleMenu.Menu
 {
 
     public class MenuItemKey : MenuItem
-    {
-        SpriteFont font;
-        
-        ContentManager content;
-        SpriteBatch spriteBatch;
+    {               
         protected double lastBlink;
-        protected Color blinkColor = Color.White;
-
-        public override String ItemName { get; set; }       
-
-        private Action<Keys> setter;
-        
-        
-        public Keys value;
-
-        public Vector2 pos;
-        Texture2D hammer;
+        protected Color blinkColor = Color.White;           
+        private readonly Action<Keys> setter;                
+        public Keys Value { get; set; }              
         Boolean polling = false;
+              
 
-        public override Boolean ItemEnabled {get;set;}        
-
-        public MenuItemKey(Game game,Vector2 pos,String itemName, Keys value,  Action<Keys> setter)
+        public MenuItemKey(Game game,Vector2 pos,String itemName, Keys value,  Action<Keys> setter, SpriteFont font, Texture2D wingdings)
             : base(game)
         {
             this.ItemName = itemName;
-            this.value = value;                  
+            this.Value = value;                  
             this.pos = pos;
-            this.setter = setter;          
+            this.setter = setter;
+            this.font = font;
+            this.wingdings = wingdings;
         }
-
-     
-
-       
+    
 
         public override void SelectItem()
         {
             polling = true;            
         }
-
-        protected override void LoadContent()
-        {
-            base.LoadContent();
-            if (content == null)
-                content = new ContentManager(Game.Services, "Content");
-
-            font = content.Load<SpriteFont>("Fonts/Arcade");            
-            spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-            hammer = content.Load<Texture2D>("Graphics/wingdings");
-
-        }
-
-        
-        protected override void UnloadContent()
-        {
-            content.Unload();
-            base.UnloadContent();
-        }
+       
 
         public override void Update(GameTime gameTime)
         {
@@ -79,14 +45,13 @@ namespace MonoGame.SimpleMenu.Menu
 
                 if (kbs.GetPressedKeyCount() == 1 && keys[0] != Keys.Enter)
                 {
-                    value = keys[0];
-                    setter(value);
+                    Value = keys[0];
+                    setter(Value);
                     polling = false;
-                    OnSelect(new MenuItemChangedEventArgs(ItemName, value));
+                    OnSelect(new MenuItemChangedEventArgs(ItemName, Value));
                 }
 
             }
-
 
             if (gameTime.TotalGameTime.TotalMilliseconds > lastBlink + 500)
             {
@@ -105,7 +70,7 @@ namespace MonoGame.SimpleMenu.Menu
             float rotation=0.0f;
             float alpha= 1.0f;                
            
-            if(ItemEnabled) spriteBatch.Draw(hammer, new Vector2(4, pos.Y), new Rectangle(32,0,16,16), Color.White);
+            if(ItemEnabled) spriteBatch.Draw(wingdings, new Vector2(4, pos.Y), new Rectangle(32,0,16,16), Color.White);
             spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);
             Color c = polling ? Color.Yellow : Color.White;
             if (polling)
@@ -114,7 +79,7 @@ namespace MonoGame.SimpleMenu.Menu
             }
             else
             {
-                spriteBatch.DrawString(font, value == null ? "" : value.ToString().ToUpper(), new Vector2(16 * 16, pos.Y), (ItemEnabled ? Color.White : Color.DarkGray) * alpha, rotation, offset, size, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(font, Value.ToString().ToUpper(), new Vector2(16 * 16, pos.Y), (ItemEnabled ? Color.White : Color.DarkGray) * alpha, rotation, offset, size, SpriteEffects.None, 0.0f);
             }
            
             spriteBatch.End();

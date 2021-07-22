@@ -15,9 +15,12 @@ using MonoGame.SimpleMenu.Events;
 namespace MonoGame.SimpleMenu.Menu
 {
     public class SettingsMenu<T> : DrawableGameComponent
-    {        
-        SoundEffect bloop;       
-        protected SpriteBatch spriteBatch;
+    {
+        private SpriteBatch spriteBatch;
+        private SoundEffect bloop;        
+        protected SpriteFont font;
+        protected Texture2D wingdings;
+        
 
         int idx = 0;
         float y = 16;
@@ -30,7 +33,7 @@ namespace MonoGame.SimpleMenu.Menu
         private readonly T myConfiguration;
         private readonly string filename;
         private readonly Game game;
-        private readonly ContentManager content;
+        private ContentManager content;
         
         public event EventHandler MenuCloseEvent;
         protected virtual void OnMenuClose(EventArgs e)
@@ -46,11 +49,10 @@ namespace MonoGame.SimpleMenu.Menu
         }
 
 
-        public SettingsMenu(Game game, ContentManager content, string filename):base(game)
+        public SettingsMenu(Game game, string filename):base(game)
         {            
             this.filename = filename;
-            this.game = game;
-            this.content = content;
+            this.game = game;            
 
             if (File.Exists(filename))
             {
@@ -63,12 +65,28 @@ namespace MonoGame.SimpleMenu.Menu
             }
         }
 
-       
-       
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+            content = new ContentManager(Game.Services, "Content");
+            bloop = content.Load<SoundEffect>("Sounds/beep");
+            font = content.Load<SpriteFont>("Fonts/Arcade");
+            wingdings = content.Load<Texture2D>("Graphics/wingdings");
+        }
+
+        protected override void UnloadContent()
+        {
+            content.Unload();
+            foreach (MenuItem item in items) item.Dispose();
+            base.UnloadContent();
+        }
+
+
         public override void Initialize()
-        {                        
-            spriteBatch = new SpriteBatch(game.GraphicsDevice);           
-            bloop = content.Load<SoundEffect>("Sounds/beep");            
+        {
+            base.Initialize();
+
+            spriteBatch = new SpriteBatch(game.GraphicsDevice);
 
             Type type = myConfiguration.GetType();
             IOrderedEnumerable<PropertyInfo> memberInfo = type.GetProperties().OrderBy(p =>
@@ -89,7 +107,7 @@ namespace MonoGame.SimpleMenu.Menu
                     }
                     else if (attribute is ConfigurationSliderAttribute csa)
                     {
-                        MenuItem menuItem = AddMenuItemVolume(csa.Name, 0, 10, 1, (int)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
+                        MenuItem menuItem = AddMenuItemVolume(csa.Name, (int)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
                         menuItem.SelectEvent += MenuItem_SelectEvent;
                     }
                     else if (attribute is ConfigurationKeyAttribute cka)
@@ -107,16 +125,17 @@ namespace MonoGame.SimpleMenu.Menu
 
             AddSpacer();
             MenuItemAction exitAction = AddMenuItemAction("Save and exit", enabled);
-            exitAction.Select += ExitAction_Select;
+            exitAction.SelectEvent += ExitActionEvent_Select;
+            
 
-        }
+        }        
 
         private void MenuItem_SelectEvent(object sender, MenuItemChangedEventArgs e)
         {
             MenuItemChanged(e);
         }
 
-        private void ExitAction_Select(object sender, EventArgs e)
+        private void ExitActionEvent_Select(object sender, EventArgs e)
         {
             JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };            
             string jsonString = JsonSerializer.Serialize(myConfiguration, options);
@@ -130,9 +149,9 @@ namespace MonoGame.SimpleMenu.Menu
         }
        
 
-        public MenuItem<T> AddMenuItem<T>(String name, T value, T[] values, Action<T> setter, Boolean enabled = false)
+        public MenuItemMulti<T> AddMenuItem<T>(string name, T value, T[] values, Action<T> setter, Boolean enabled = false)
         {
-            MenuItem<T> item = new MenuItem<T>(game, new Vector2(240, y),name, value, values,setter);
+            MenuItemMulti<T> item = new MenuItemMulti<T>(game, new Vector2(240, y),name, value, values,setter,font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
@@ -142,7 +161,7 @@ namespace MonoGame.SimpleMenu.Menu
 
         public MenuItemKey AddMenuItemKey(String name, Keys value,  Action<Keys> setter, Boolean enabled = false)
         {
-            MenuItemKey item = new MenuItemKey(game, new Vector2(240, y), name, value, setter);
+            MenuItemKey item = new MenuItemKey(game, new Vector2(240, y), name, value, setter, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
@@ -152,7 +171,7 @@ namespace MonoGame.SimpleMenu.Menu
 
         public MenuItemAction AddMenuItemAction(String name, Boolean enabled = false)
         {
-            MenuItemAction item = new MenuItemAction(game, new Vector2(240, y), name);
+            MenuItemAction item = new MenuItemAction(game, new Vector2(240, y), name, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
@@ -161,29 +180,22 @@ namespace MonoGame.SimpleMenu.Menu
         }
 
 
-        public MenuItemVolume AddMenuItemVolume(String name, int min, int max, int step, int value, Action<int> setter, Boolean enabled = false)
+        public MenuItemVolume AddMenuItemVolume(String name, int value, Action<int> setter, Boolean enabled = false)
         {
-            MenuItemVolume item = new MenuItemVolume(game, new Vector2(240, y), name, min,max, step,value, setter);
+            MenuItemVolume item = new MenuItemVolume(game, new Vector2(240, y), name, value, setter, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
             y += 24;
             return item;
-        }
-
-     
+        }     
 
         public Boolean KeyPressed(Keys key, Boolean repeat = false)
         {
-            if (current.IsKeyDown(key) && (last.IsKeyUp(key) || repeat)) return true;
-            return false;
-        }
+            return (current.IsKeyDown(key) && (last.IsKeyUp(key) || repeat));
+        }     
 
-        public void UnloadContent()
-        {            
-            content.Unload();
-            foreach(MenuItem item in items) item.Dispose();
-        }        
+             
 
         public override void Update(GameTime gameTime)
         {
