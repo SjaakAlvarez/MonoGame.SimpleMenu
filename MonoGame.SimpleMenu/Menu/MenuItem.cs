@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.SimpleMenu.Events;
 
 namespace MonoGame.SimpleMenu.Menu
 {
@@ -15,7 +16,15 @@ namespace MonoGame.SimpleMenu.Menu
         public abstract void SelectItem();    
 
         public abstract Boolean ItemEnabled {get;set;}
-        public abstract String ItemName { get; set; }        
+        public abstract String ItemName { get; set; }
+
+        public delegate void SelectHandler(object sender, MenuItemChangedEventArgs e);
+        public event SelectHandler SelectEvent;
+
+        protected virtual void OnSelect(MenuItemChangedEventArgs e)
+        {
+            SelectEvent?.Invoke(this, e);
+        }
     }
 
     public class MenuItem<T> : MenuItem
@@ -36,14 +45,7 @@ namespace MonoGame.SimpleMenu.Menu
 
         public override Boolean ItemEnabled {get;set;}
 
-        public delegate void SelectHandler(object sender, EventArgs e);
-        public event SelectHandler Select;
-
-        protected virtual void OnSelect(EventArgs e)
-        {
-            if (Select != null)
-                Select(this, e);
-        }
+        
 
         public MenuItem(Game game,Vector2 pos,String itemName, T value, T[] itemValues,  Action<T> setter)
             : base(game)
@@ -67,7 +69,7 @@ namespace MonoGame.SimpleMenu.Menu
 
                 setter(Value);
             }
-            OnSelect(new EventArgs());           
+            OnSelect(new MenuItemChangedEventArgs(ItemName,Value));           
         }
 
         protected override void LoadContent()

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.SimpleMenu.Events;
 
 namespace MonoGame.SimpleMenu.Menu
 {
@@ -27,15 +28,10 @@ namespace MonoGame.SimpleMenu.Menu
         Color[] colors;
         public override Boolean ItemEnabled {get;set;}
 
-        public delegate void SelectHandler(object sender, EventArgs e);
-        public event SelectHandler Select;
+        
         private Action<int> setter;
 
-        protected virtual void OnSelect(EventArgs e)
-        {
-            if (Select != null)
-                Select(this, e);
-        }
+        
 
         public MenuItemVolume(Game game,Vector2 pos,String itemName, int min, int max, int step,int value, Action<int> setter)
             : base(game)
@@ -75,7 +71,7 @@ namespace MonoGame.SimpleMenu.Menu
 
 
             setter(value);
-            OnSelect(new EventArgs());
+            OnSelect(new MenuItemChangedEventArgs(ItemName, value));
            
         }
 
