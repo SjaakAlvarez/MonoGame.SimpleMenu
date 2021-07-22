@@ -10,6 +10,7 @@ using MonoGame.SimpleMenu.Attributes;
 using System.Linq;
 using System.IO;
 using System.Text.Json;
+using MonoGame.SimpleMenu.Events;
 
 namespace MonoGame.SimpleMenu.Menu
 {
@@ -30,7 +31,19 @@ namespace MonoGame.SimpleMenu.Menu
         private readonly string filename;
         private readonly Game game;
         private readonly ContentManager content;
-       
+        
+        public event EventHandler MenuCloseEvent;
+        protected virtual void OnMenuClose(EventArgs e)
+        {
+            MenuCloseEvent?.Invoke(this, e);
+        }
+
+        public delegate void MenuItemChangedEventHandler(object sender, MenuItemChangedEventArgs e);
+        public event MenuItemChangedEventHandler MenuItemChangedEvent;
+        protected virtual void MenuItemChanged(MenuItemChangedEventArgs e)
+        {
+            MenuItemChangedEvent?.Invoke(this, e);
+        }
 
 
         public SettingsMenu(Game game, ContentManager content, string filename):base(game)
@@ -71,15 +84,18 @@ namespace MonoGame.SimpleMenu.Menu
                 {
                     if (attribute is ConfigurationAttribute ca)
                     {                                        
-                        AddMenuItem(ca.Name, m.GetValue(myConfiguration), ca.Values, p => m.SetValue(myConfiguration, p), enabled);                       
+                        MenuItem menuItem=AddMenuItem(ca.Name, m.GetValue(myConfiguration), ca.Values, p => m.SetValue(myConfiguration, p), enabled);
+                        menuItem.SelectEvent += MenuItem_SelectEvent;
                     }
                     else if (attribute is ConfigurationSliderAttribute csa)
-                    {                        
-                        AddMenuItemVolume(csa.Name, 0, 10, 1, (int)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
+                    {
+                        MenuItem menuItem = AddMenuItemVolume(csa.Name, 0, 10, 1, (int)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
+                        menuItem.SelectEvent += MenuItem_SelectEvent;
                     }
                     else if (attribute is ConfigurationKeyAttribute cka)
-                    {                        
-                        AddMenuItemKey(cka.Name, (Keys)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
+                    {
+                        MenuItem menuItem = AddMenuItemKey(cka.Name, (Keys)m.GetValue(myConfiguration), p => m.SetValue(myConfiguration, p), enabled);
+                        menuItem.SelectEvent += MenuItem_SelectEvent;
                     }                    
                     else if (attribute is SpacerAttribute spacer)
                     {                        
@@ -95,12 +111,17 @@ namespace MonoGame.SimpleMenu.Menu
 
         }
 
+        private void MenuItem_SelectEvent(object sender, MenuItemChangedEventArgs e)
+        {
+            MenuItemChanged(e);
+        }
+
         private void ExitAction_Select(object sender, EventArgs e)
         {
             JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };            
             string jsonString = JsonSerializer.Serialize(myConfiguration, options);
             File.WriteAllText(filename, jsonString);
-            //ScreenManager.RemoveScreen(this);
+            OnMenuClose(new EventArgs());
         }
 
         public void AddSpacer()
@@ -210,8 +231,6 @@ namespace MonoGame.SimpleMenu.Menu
 
             foreach (MenuItem item in items) item.Update(gameTime);
         }
-
-
        
         public override void Draw(GameTime gameTime)
         {            

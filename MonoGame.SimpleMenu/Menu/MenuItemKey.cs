@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.SimpleMenu.Events;
 
 namespace MonoGame.SimpleMenu.Menu
 {
@@ -28,16 +29,7 @@ namespace MonoGame.SimpleMenu.Menu
         Texture2D hammer;
         Boolean polling = false;
 
-        public override Boolean ItemEnabled {get;set;}
-
-        public delegate void SelectHandler(object sender, EventArgs e);
-        public event SelectHandler Select;
-
-        protected virtual void OnSelect(EventArgs e)
-        {
-            if (Select != null)
-                Select(this, e);
-        }
+        public override Boolean ItemEnabled {get;set;}        
 
         public MenuItemKey(Game game,Vector2 pos,String itemName, Keys value,  Action<Keys> setter)
             : base(game)
@@ -54,8 +46,7 @@ namespace MonoGame.SimpleMenu.Menu
 
         public override void SelectItem()
         {
-            polling = true;
-            OnSelect(new EventArgs());          
+            polling = true;            
         }
 
         protected override void LoadContent()
@@ -91,6 +82,7 @@ namespace MonoGame.SimpleMenu.Menu
                     value = keys[0];
                     setter(value);
                     polling = false;
+                    OnSelect(new MenuItemChangedEventArgs(ItemName, value));
                 }
 
             }
