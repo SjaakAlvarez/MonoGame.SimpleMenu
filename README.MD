@@ -1,3 +1,7 @@
+## Example
+
+Create a class that holds the configuration items:
+
 ```C#
     public class DemoConfiguration
     {
@@ -26,11 +30,18 @@
     }
 ```
 
+Create the menu in the Initialize of the Game class:
+
 ```C#
-    SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, Content, "game.json");
-    menu.MenuCloseEvent += Menu_MenuCloseEvent;            
-    Components.Add(menu);
+    protected override void Initialize()
+    {        
+        SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, Content, "game.json");
+        menu.MenuCloseEvent += Menu_MenuCloseEvent;        
+        Components.Add(menu);           
+        base.Initialize();
+    }
 ```
 
+Check out the Demo project for more examples:
 
 ![alt text](Documentation/demo.gif)
