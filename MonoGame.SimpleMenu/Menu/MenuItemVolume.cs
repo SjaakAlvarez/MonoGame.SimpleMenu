@@ -67,11 +67,11 @@ namespace MonoGame.SimpleMenu.Menu
             spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);
             for (int i = Value; i < 10; i++)
             {                
-                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y+12, 14, 2), new Rectangle(0,0,1,1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
+                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y+ font.LineSpacing-4, 14, 2), new Rectangle(0,0,1,1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
             }
             for (int i = 0; i < Value; i++)
             {
-                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y-2, 14, 16), new Rectangle(0, 0, 1, 1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
+                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y-2, 14, font.LineSpacing), new Rectangle(0, 0, 1, 1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
             }                        
 
             spriteBatch.End();
