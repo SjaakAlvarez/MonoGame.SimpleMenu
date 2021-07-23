@@ -18,19 +18,19 @@ namespace MonoGame.SimpleMenu.Menu
         protected SoundEffect bloop;        
         protected SpriteFont font;
         protected Texture2D wingdings;
+        protected ContentManager content;
 
-        int idx = 0;
-        float y = 16;
+        private int idx = 0;
+        private float y = 16;
         private int spacing;
-        Boolean repeat;
-        double repeatTime;
+        private Boolean repeat;
+        private double repeatTime;
 
         protected KeyboardState current, last;
 
         protected List<MenuItem> items = new List<MenuItem>();
         private readonly T myConfiguration;        
-        private readonly Game game;
-        private ContentManager content;
+        private readonly Game game;        
 
         public delegate void MenuCloseEventHandler(object sender, MenuCloseEventArgs e);
         public event MenuCloseEventHandler MenuCloseEvent;
@@ -126,8 +126,14 @@ namespace MonoGame.SimpleMenu.Menu
 
         }        
 
+        protected virtual void ItemChanged()
+        {
+            if (!bloop.IsDisposed) bloop.Play();
+        }
+
         private void MenuItem_SelectEvent(object sender, MenuItemChangedEventArgs e)
         {
+            ItemChanged();
             MenuItemChanged(e);
         }
 
@@ -232,8 +238,7 @@ namespace MonoGame.SimpleMenu.Menu
             }
             if (KeyPressed(Keys.Enter))
             {
-                items[idx].SelectItem();
-                if (!bloop.IsDisposed) bloop.Play();
+                items[idx].SelectItem();               
             }
 
             last = current;
