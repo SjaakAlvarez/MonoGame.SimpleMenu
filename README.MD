@@ -1,4 +1,4 @@
-## Example
+## How to use
 
 ![alt text](Documentation/demo.gif)
 
@@ -40,6 +40,13 @@ Create the menu in the Game class:
     menu.MenuCloseEvent += Menu_MenuCloseEvent;        
     Components.Add(menu);                       
 ```
+
+And make sure the the following files are in your Content folder:
+- Fonts/Arcade.spritefont
+- Fonts/PressStart2P-Regular.ttf
+- Sounds/beep.wav
+
+## More information
 
 Check out the Demo project for more examples:
 

@@ -63,7 +63,7 @@ namespace MonoGame.SimpleMenu.Demo
                     }
                     else
                     {
-                        spriteBatch.Draw(laseranim, new Vector2(2, item.pos.Y - 8), new Rectangle(0, (int)(animationFrame * 64), 820, 64), Color.White, 0.0f, new Vector2(0, 16), 1.0f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(laseranim, new Vector2(2, item.pos.Y - 8), new Rectangle(0, (animationFrame * 64), 820, 64), Color.White, 0.0f, new Vector2(0, 16), 1.0f, SpriteEffects.None, 0);
                     }
                 }
                 
