@@ -2,8 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.SimpleMenu.Demo.Configuration;
+using MonoGame.SimpleMenu.Events;
 using MonoGame.SimpleMenu.Menu;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace MonoGame.SimpleMenu.Demo
 {
@@ -14,7 +17,7 @@ namespace MonoGame.SimpleMenu.Demo
         string lastChange="LAST CHANGE:";
         SpriteFont font;
         private KeyboardState current, last;
-
+        private DemoConfiguration demoConfiguration;        
 
         public Game1()
         {
@@ -30,17 +33,7 @@ namespace MonoGame.SimpleMenu.Demo
             _graphics.ApplyChanges();            
            
             base.Initialize();
-        }
-
-        private void Menu_MenuItemChangedEvent(object sender, Events.MenuItemChangedEventArgs e)
-        {
-            lastChange = string.Format("LAST CHANGE: {0}={1}", e.Name, e.Value);
-        }
-
-        private void Menu_MenuCloseEvent(object sender, System.EventArgs e)
-        {            
-            Components.Remove((DrawableGameComponent)sender);
-        }
+        }        
 
         protected override void LoadContent()
         {
@@ -51,44 +44,67 @@ namespace MonoGame.SimpleMenu.Demo
 
         protected override void Update(GameTime gameTime)
         {
-
-            KeyboardState current = Keyboard.GetState();
+            current = Keyboard.GetState();
 
             if (current.IsKeyDown(Keys.Escape))
                 Exit();  
             
             if(current.IsKeyDown(Keys.D1) && last.IsKeyUp(Keys.D1) && Components.Count==0)
             {
-                SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, "game.json");
-                menu.MenuCloseEvent += Menu_MenuCloseEvent;
-                menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
-                Components.Add(menu);
-            }
-
-            if (current.IsKeyDown(Keys.D2) && last.IsKeyUp(Keys.D2) && Components.Count == 0)
-            {
-                SettingsMenu<ItemDemoConfiguration> menu = new SettingsMenu<ItemDemoConfiguration>(this, "game2.json");
-                menu.MenuCloseEvent += Menu_MenuCloseEvent;
-                menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
-                Components.Add(menu);
+                createDemoMenu();
             }
 
             last = current;
 
             base.Update(gameTime);
         }
-
+        
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);                     
 
             base.Draw(gameTime);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin();            
             _spriteBatch.DrawString(font, "SIMPLE MENU DEMO", new Vector2(16, 584 - 48), Color.Yellow);
-            _spriteBatch.DrawString(font, "PRESS '1' OR '2' FOR DEMO MENUS", new Vector2(16, 584-24),Color.Cyan);
+            _spriteBatch.DrawString(font, "PRESS '1' FOR DEMO MENU", new Vector2(16, 584-24),Color.Cyan);
             _spriteBatch.DrawString(font, lastChange, new Vector2(16, 584), Color.Cyan);
             _spriteBatch.End();
         }
+
+        #region Menu Stuff
+        private void Menu_MenuItemChangedEvent(object sender, Events.MenuItemChangedEventArgs e)
+        {
+            lastChange = string.Format("LAST CHANGE: {0}={1}", e.Name, e.Value);
+        }
+
+        private void Menu_DemoMenuCloseEvent(object sender, MenuCloseEventArgs e)
+        {
+            if (e.Save)
+            {
+                JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };
+                string jsonString = JsonSerializer.Serialize(demoConfiguration, options);
+                File.WriteAllText("game.json", jsonString);
+            }
+            Components.Remove((DrawableGameComponent)sender);
+        }
+
+        private void createDemoMenu()
+        {
+            if (File.Exists("game.json"))
+            {
+                string jsonString = File.ReadAllText("game.json");
+                demoConfiguration = JsonSerializer.Deserialize<DemoConfiguration>(jsonString);
+            }
+            else
+            {
+                demoConfiguration = new DemoConfiguration();
+            }
+            SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, demoConfiguration);
+            menu.MenuCloseEvent += Menu_DemoMenuCloseEvent;
+            menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
+            Components.Add(menu);
+        }
+        #endregion
     }
 }

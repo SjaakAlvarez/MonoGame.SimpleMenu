@@ -10,7 +10,7 @@ namespace MonoGame.SimpleMenu.Menu
     {
         public bool ItemEnabled { get; set; }
         public string ItemName { get; set; }
-        protected Vector2 pos;
+        public Vector2 pos;
         protected SpriteFont font;        
         protected SpriteBatch spriteBatch;
         protected Texture2D wingdings;

@@ -4,26 +4,9 @@
 	[
 
 	],
-	"content": {
-		"textures": {
-			"path": "Graphics/*.png",
-			"recursive": "True",
-			"action": "build",
-			"importer": "TextureImporter",
-			"processor": "TextureProcessor",
-			"processorParam": {
-				"ColorKeyColor": "255,0,255,255",
-				"ColorKeyEnabled": "True",
-				"GenerateMipmaps": "False",
-				"PremultiplyAlpha": "True",
-				"ResizeToPowerOfTwo": "False",
-				"MakeSquare": "False",
-				"TextureFormat": "Color"
-			}
-		},
+	"content": {		
 		"fonts": {
-			"path": "Fonts/*.spritefont",
-			"recursive": "True",
+			"path": "Fonts/*.spritefont",			
 			"action": "build",
 			"importer": "FontDescriptionImporter",
 			"processor": "FontDescriptionProcessor",
@@ -33,8 +16,7 @@
 			}
 		},
 		"soundeffects": {
-			"path": "Sounds/*.wav",
-			"recursive": "True",
+			"path": "Sounds/*.wav",			
 			"action": "build",
 			"importer": "WavImporter",
 			"processor": "SoundEffectProcessor",

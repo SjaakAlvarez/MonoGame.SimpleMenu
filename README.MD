@@ -33,8 +33,8 @@ Create a class that holds the configuration items:
 Create the menu in the Game class:
 
 ```C#      
-    //Create a menu for DemoConfiguration. Settings will be stored in the file 'game.json'
-    SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, "game.json");
+    //Create a menu for DemoConfiguration
+    SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, myConfiguration);
     menu.MenuCloseEvent += Menu_MenuCloseEvent;        
     Components.Add(menu);                       
 ```
