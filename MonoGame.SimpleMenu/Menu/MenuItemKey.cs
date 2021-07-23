@@ -68,9 +68,10 @@ namespace MonoGame.SimpleMenu.Menu
 
             float size=1.0f;            
             float rotation=0.0f;
-            float alpha= 1.0f;                
-           
-            if(ItemEnabled) spriteBatch.Draw(wingdings, new Vector2(4, pos.Y), new Rectangle(32,0,16,16), Color.White);
+            float alpha= 1.0f;
+
+
+            if (ItemEnabled) spriteBatch.DrawString(font,">", new Vector2(8, (int)pos.Y ), Color.White);
             spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);
             Color c = polling ? Color.Yellow : Color.White;
             if (polling)

@@ -8,8 +8,6 @@ using Microsoft.Xna.Framework.Input;
 using System.Reflection;
 using MonoGame.SimpleMenu.Attributes;
 using System.Linq;
-using System.IO;
-using System.Text.Json;
 using MonoGame.SimpleMenu.Events;
 
 namespace MonoGame.SimpleMenu.Menu
@@ -20,7 +18,6 @@ namespace MonoGame.SimpleMenu.Menu
         private SoundEffect bloop;        
         protected SpriteFont font;
         protected Texture2D wingdings;
-        
 
         int idx = 0;
         float y = 16;
@@ -30,13 +27,13 @@ namespace MonoGame.SimpleMenu.Menu
         protected KeyboardState current, last;
 
         protected List<MenuItem> items = new List<MenuItem>();
-        private readonly T myConfiguration;
-        private readonly string filename;
+        private readonly T myConfiguration;        
         private readonly Game game;
         private ContentManager content;
-        
-        public event EventHandler MenuCloseEvent;
-        protected virtual void OnMenuClose(EventArgs e)
+
+        public delegate void MenuCloseEventHandler(object sender, MenuCloseEventArgs e);
+        public event MenuCloseEventHandler MenuCloseEvent;
+        protected virtual void OnMenuClose(MenuCloseEventArgs e)
         {
             MenuCloseEvent?.Invoke(this, e);
         }
@@ -49,20 +46,10 @@ namespace MonoGame.SimpleMenu.Menu
         }
 
 
-        public SettingsMenu(Game game, string filename):base(game)
+        public SettingsMenu(Game game, T myConfiguration) :base(game)
         {            
-            this.filename = filename;
-            this.game = game;            
-
-            if (File.Exists(filename))
-            {
-                string jsonString = File.ReadAllText(filename);
-                myConfiguration = JsonSerializer.Deserialize<T>(jsonString);
-            }
-            else
-            {
-                myConfiguration = Activator.CreateInstance<T>();
-            }
+            this.myConfiguration=myConfiguration;
+            this.game = game;                        
         }
 
         protected override void LoadContent()
@@ -70,8 +57,7 @@ namespace MonoGame.SimpleMenu.Menu
             base.LoadContent();
             content = new ContentManager(Game.Services, "Content");
             bloop = content.Load<SoundEffect>("Sounds/beep");
-            font = content.Load<SpriteFont>("Fonts/Arcade");
-            wingdings = content.Load<Texture2D>("Graphics/wingdings");
+            font = content.Load<SpriteFont>("Fonts/Arcade");               
         }
 
         protected override void UnloadContent()
@@ -82,11 +68,14 @@ namespace MonoGame.SimpleMenu.Menu
         }
 
 
+        
         public override void Initialize()
         {
             base.Initialize();
 
             spriteBatch = new SpriteBatch(game.GraphicsDevice);
+            wingdings = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            wingdings.SetData(new[] { Color.White });
 
             Type type = myConfiguration.GetType();
             IOrderedEnumerable<PropertyInfo> memberInfo = type.GetProperties().OrderBy(p =>
@@ -124,9 +113,12 @@ namespace MonoGame.SimpleMenu.Menu
             }
 
             AddSpacer();
-            MenuItemAction exitAction = AddMenuItemAction("Save and exit", enabled);
+            MenuItemAction saveAndExitAction = AddMenuItemAction("Save and exit", enabled);
+            saveAndExitAction.SelectEvent += SaveAndExitActionEvent_Select;
+
+            MenuItemAction exitAction = AddMenuItemAction("Exit", enabled);
             exitAction.SelectEvent += ExitActionEvent_Select;
-            
+
 
         }        
 
@@ -135,12 +127,14 @@ namespace MonoGame.SimpleMenu.Menu
             MenuItemChanged(e);
         }
 
+        private void SaveAndExitActionEvent_Select(object sender, EventArgs e)
+        {            
+            OnMenuClose(new MenuCloseEventArgs(myConfiguration,true));
+        }
+
         private void ExitActionEvent_Select(object sender, EventArgs e)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };            
-            string jsonString = JsonSerializer.Serialize(myConfiguration, options);
-            File.WriteAllText(filename, jsonString);
-            OnMenuClose(new EventArgs());
+            OnMenuClose(new MenuCloseEventArgs(myConfiguration, false));
         }
 
         public void AddSpacer()
@@ -248,8 +242,8 @@ namespace MonoGame.SimpleMenu.Menu
         {            
             spriteBatch.Begin();
             foreach(MenuItem item in items)
-            {
-                item.Draw(gameTime);
+            {                
+                item.Draw(gameTime);                
             }           
             spriteBatch.End();
         }
