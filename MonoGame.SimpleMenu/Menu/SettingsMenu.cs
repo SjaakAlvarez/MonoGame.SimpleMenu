@@ -14,8 +14,8 @@ namespace MonoGame.SimpleMenu.Menu
 {
     public class SettingsMenu<T> : DrawableGameComponent
     {
-        private SpriteBatch spriteBatch;
-        private SoundEffect bloop;        
+        protected SpriteBatch spriteBatch;
+        protected SoundEffect bloop;        
         protected SpriteFont font;
         protected Texture2D wingdings;
 
@@ -246,7 +246,7 @@ namespace MonoGame.SimpleMenu.Menu
         {           
             spriteBatch.Begin();
             foreach(MenuItem item in items)
-            {                
+            {
                 item.Draw(gameTime);                
             }           
             spriteBatch.End();

@@ -9,7 +9,7 @@ namespace MonoGame.SimpleMenu.Menu
     public class MenuItemVolume : MenuItem 
     {       
         public int Value { get; set; }
-        private readonly Color[] colors;
+        public Color[] Colors { get; set; }
         private readonly Action<int> setter;        
 
         public MenuItemVolume(Game game,Vector2 pos,String itemName, int value, Action<int> setter, SpriteFont font, Texture2D wingdings)
@@ -22,11 +22,11 @@ namespace MonoGame.SimpleMenu.Menu
             this.font = font;
             this.wingdings = wingdings;
 
-            colors = new Color[10];
+            Colors = new Color[10];
             for(int i=0;i<5;i++)
             {
-                colors[i] = Color.Lerp(Color.DarkGreen, Color.Yellow, (float)i / 5.0f);
-                colors[i+5] = Color.Lerp(Color.Yellow, Color.Red, (float)i / 5.0f);
+                Colors[i] = Color.Lerp(Color.DarkGreen, Color.Yellow, (float)i / 5.0f);
+                Colors[i+5] = Color.Lerp(Color.Yellow, Color.Red, (float)i / 5.0f);
             }
          
         }
@@ -48,7 +48,7 @@ namespace MonoGame.SimpleMenu.Menu
             OnSelect(new MenuItemChangedEventArgs(ItemName, Value));           
         }      
 
-        private Color ColorToGray(Color c)
+        public Color ColorToGray(Color c)
         {
             int avg = (c.R + c.G + c.B) / 3;
             return new Color(avg,avg,avg);
@@ -67,11 +67,11 @@ namespace MonoGame.SimpleMenu.Menu
             spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);
             for (int i = Value; i < 10; i++)
             {                
-                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y+ font.LineSpacing-4, 14, 2), new Rectangle(0,0,1,1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
+                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y+ font.LineSpacing-4, 14, 2), new Rectangle(0,0,1,1), (ItemEnabled ? Colors[i] : ColorToGray(Colors[i])) * alpha);                
             }
             for (int i = 0; i < Value; i++)
             {
-                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y-2, 14, font.LineSpacing), new Rectangle(0, 0, 1, 1), (ItemEnabled ? colors[i] : ColorToGray(colors[i])) * alpha);                
+                spriteBatch.Draw(wingdings, new Rectangle(256 + i * 16, (int)pos.Y-2, 14, font.LineSpacing), new Rectangle(0, 0, 1, 1), (ItemEnabled ? Colors[i] : ColorToGray(Colors[i])) * alpha);                
             }                        
 
             spriteBatch.End();
