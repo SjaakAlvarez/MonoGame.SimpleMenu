@@ -1,5 +1,7 @@
 ## Example
 
+![alt text](Documentation/demo.gif)
+
 Create a class that holds the configuration items:
 
 ```C#
@@ -41,4 +43,5 @@ Create the menu in the Game class:
 
 Check out the Demo project for more examples:
 
-![alt text](Documentation/demo.gif)
+![alt text](Documentation/demo2.gif)
+
