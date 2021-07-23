@@ -14,13 +14,14 @@ namespace MonoGame.SimpleMenu.Menu
 {
     public class SettingsMenu<T> : DrawableGameComponent
     {
-        private SpriteBatch spriteBatch;
-        private SoundEffect bloop;        
+        protected SpriteBatch spriteBatch;
+        protected SoundEffect bloop;        
         protected SpriteFont font;
         protected Texture2D wingdings;
 
         int idx = 0;
         float y = 16;
+        private int spacing;
         Boolean repeat;
         double repeatTime;
 
@@ -76,6 +77,9 @@ namespace MonoGame.SimpleMenu.Menu
             spriteBatch = new SpriteBatch(game.GraphicsDevice);
             wingdings = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             wingdings.SetData(new[] { Color.White });
+
+            spacing = (int)(font.LineSpacing * 1.5f);
+
 
             Type type = myConfiguration.GetType();
             IOrderedEnumerable<PropertyInfo> memberInfo = type.GetProperties().OrderBy(p =>
@@ -139,48 +143,48 @@ namespace MonoGame.SimpleMenu.Menu
 
         public void AddSpacer()
         {
-            y+=16;
+            y+= font.LineSpacing;
         }
        
 
         public MenuItemMulti<T> AddMenuItem<T>(string name, T value, T[] values, Action<T> setter, Boolean enabled = false)
         {
-            MenuItemMulti<T> item = new MenuItemMulti<T>(game, new Vector2(240, y),name, value, values,setter,font, wingdings);
+            MenuItemMulti<T> item = new MenuItemMulti<T>(game, new Vector2(0, y),name, value, values,setter,font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
-            y += 24;
+            y += spacing;
             return item;
         }
 
         public MenuItemKey AddMenuItemKey(String name, Keys value,  Action<Keys> setter, Boolean enabled = false)
         {
-            MenuItemKey item = new MenuItemKey(game, new Vector2(240, y), name, value, setter, font, wingdings);
+            MenuItemKey item = new MenuItemKey(game, new Vector2(0, y), name, value, setter, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
-            y += 24;
+            y += spacing;
             return item;
         }
 
         public MenuItemAction AddMenuItemAction(String name, Boolean enabled = false)
         {
-            MenuItemAction item = new MenuItemAction(game, new Vector2(240, y), name, font, wingdings);
+            MenuItemAction item = new MenuItemAction(game, new Vector2(0, y), name, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
-            y += 24;
+            y += spacing;
             return item;
         }
 
 
         public MenuItemVolume AddMenuItemVolume(String name, int value, Action<int> setter, Boolean enabled = false)
         {
-            MenuItemVolume item = new MenuItemVolume(game, new Vector2(240, y), name, value, setter, font, wingdings);
+            MenuItemVolume item = new MenuItemVolume(game, new Vector2(0, y), name, value, setter, font, wingdings);
             item.Initialize();
             item.ItemEnabled = enabled;
             items.Add(item);
-            y += 24;
+            y += spacing;
             return item;
         }     
 
@@ -239,10 +243,10 @@ namespace MonoGame.SimpleMenu.Menu
         }
        
         public override void Draw(GameTime gameTime)
-        {            
+        {           
             spriteBatch.Begin();
             foreach(MenuItem item in items)
-            {                
+            {
                 item.Draw(gameTime);                
             }           
             spriteBatch.End();

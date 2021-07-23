@@ -12,7 +12,7 @@ namespace MonoGame.SimpleMenu.Demo
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         string lastChange="LAST CHANGE:";
         SpriteFont font;
@@ -54,6 +54,11 @@ namespace MonoGame.SimpleMenu.Demo
                 createDemoMenu();
             }
 
+            if (current.IsKeyDown(Keys.D2) && last.IsKeyUp(Keys.D2) && Components.Count == 0)
+            {
+                createCustomDemoMenu();
+            }
+
             last = current;
 
             base.Update(gameTime);
@@ -67,7 +72,7 @@ namespace MonoGame.SimpleMenu.Demo
 
             _spriteBatch.Begin();            
             _spriteBatch.DrawString(font, "SIMPLE MENU DEMO", new Vector2(16, 584 - 48), Color.Yellow);
-            _spriteBatch.DrawString(font, "PRESS '1' FOR DEMO MENU", new Vector2(16, 584-24),Color.Cyan);
+            _spriteBatch.DrawString(font, "PRESS '1' FOR DEMO MENU, '2' FOR CUSTOM MENU", new Vector2(16, 584-24),Color.Cyan);
             _spriteBatch.DrawString(font, lastChange, new Vector2(16, 584), Color.Cyan);
             _spriteBatch.End();
         }
@@ -101,6 +106,23 @@ namespace MonoGame.SimpleMenu.Demo
                 demoConfiguration = new DemoConfiguration();
             }
             SettingsMenu<DemoConfiguration> menu = new SettingsMenu<DemoConfiguration>(this, demoConfiguration);
+            menu.MenuCloseEvent += Menu_DemoMenuCloseEvent;
+            menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
+            Components.Add(menu);
+        }
+
+        private void createCustomDemoMenu()
+        {
+            if (File.Exists("game.json"))
+            {
+                string jsonString = File.ReadAllText("game.json");
+                demoConfiguration = JsonSerializer.Deserialize<DemoConfiguration>(jsonString);
+            }
+            else
+            {
+                demoConfiguration = new DemoConfiguration();
+            }
+            CustomSettingsMenu<DemoConfiguration> menu = new CustomSettingsMenu<DemoConfiguration>(this, demoConfiguration);
             menu.MenuCloseEvent += Menu_DemoMenuCloseEvent;
             menu.MenuItemChangedEvent += Menu_MenuItemChangedEvent;
             Components.Add(menu);

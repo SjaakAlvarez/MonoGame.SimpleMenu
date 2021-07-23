@@ -10,10 +10,10 @@ namespace MonoGame.SimpleMenu.Menu
     public class MenuItemKey : MenuItem
     {               
         protected double lastBlink;
-        protected Color blinkColor = Color.White;           
+        public Color blinkColor { get; set; } = Color.White;           
         private readonly Action<Keys> setter;                
         public Keys Value { get; set; }              
-        Boolean polling = false;
+        public Boolean Polling { get; set; }
               
 
         public MenuItemKey(Game game,Vector2 pos,String itemName, Keys value,  Action<Keys> setter, SpriteFont font, Texture2D wingdings)
@@ -30,7 +30,7 @@ namespace MonoGame.SimpleMenu.Menu
 
         public override void SelectItem()
         {
-            polling = true;            
+            Polling = true;            
         }
        
 
@@ -38,7 +38,7 @@ namespace MonoGame.SimpleMenu.Menu
         {
             base.Update(gameTime);
 
-            if (polling)
+            if (Polling)
             {
                 KeyboardState kbs = Keyboard.GetState();
                 Keys[] keys = kbs.GetPressedKeys();
@@ -47,7 +47,7 @@ namespace MonoGame.SimpleMenu.Menu
                 {
                     Value = keys[0];
                     setter(Value);
-                    polling = false;
+                    Polling = false;
                     OnSelect(new MenuItemChangedEventArgs(ItemName, Value));
                 }
 
@@ -72,9 +72,8 @@ namespace MonoGame.SimpleMenu.Menu
 
 
             if (ItemEnabled) spriteBatch.DrawString(font,">", new Vector2(8, (int)pos.Y ), Color.White);
-            spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);
-            Color c = polling ? Color.Yellow : Color.White;
-            if (polling)
+            spriteBatch.DrawString(font, ItemName.ToUpper(), new Vector2(2*16,pos.Y), (ItemEnabled?Color.White:Color.DarkGray)*alpha,rotation, offset, size, SpriteEffects.None, 0.0f);            
+            if (Polling)
             {
                 spriteBatch.DrawString(font, "Press any key", new Vector2(16 * 16, pos.Y), (ItemEnabled ? blinkColor : Color.DarkGray) * alpha, rotation, offset, size, SpriteEffects.None, 0.0f);
             }
